@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
 import { Context } from "../../utils/context";
 import { useParams } from "react-router-dom";
-// import useFetch from "../../hooks/useFetch";
+import useFetch from "../../hooks/useFetch";
 import RelatedProducts from "./RelatedProducts/RelatedProducts";
 import {
     FaFacebookF,
