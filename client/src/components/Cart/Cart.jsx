@@ -5,11 +5,32 @@ import { BsCartX } from "react-icons/bs";
 import { Context } from "../../utils/context";
 import CartItem from "./CartItem/CartItem";
 import { loadStripe } from "@stripe/stripe-js";
-// import { makePaymentRequest } from "../../utils/api";
+import { makePaymentRequest } from "../../utils/api";
 
 
 const Cart = ({setShowCart}) => {
-    const {CartItems, cartSubTotal} = useContext(Context)
+    const {cartItems, cartSubTotal} = useContext(Context)
+
+    const stripePromise = loadStripe("pk_test_51NUynRSFKUeWy37QRtE1bQ4HEQZnet7ORYA2hvg9LHwYp4J14hemPiT5b7W1KCrUXk49Err6zVRwfqmjzJVgUzNn0090IsfhKz"
+    );
+    const handlePayment = async () => {
+        try {
+            const stripe = await stripePromise;
+            const res = await makePaymentRequest.post("/api/order",
+            {
+                product : cartItems
+            });
+          console.log("i was hereeee below ressssss");
+          await stripe.redirectToCheckout({
+            sessionId: res.data.stripeSession.id,
+          });
+    
+        } catch (err) {
+            console.log(err);
+          console.log("Error in handlepayment");
+        }
+      };
+
     return (
         <div className="cart-panel">
             <div className="opac-layer"></div>
@@ -22,13 +43,13 @@ const Cart = ({setShowCart}) => {
                     </span>
                 </div>
 
-                {!CartItems?.length && <div className="empty-cart">
+                {!cartItems && <div className="empty-cart">
                     <BsCartX />
                     <span>No Products</span>
                     <button className="return-cta">Return to Shop</button>
                 </div>}
 
-                {CartItems?.length && <>
+                {!!cartItems && <>
                     <CartItem />
                     <div className="cart-footer">
                         <div className="subtotal">
@@ -36,7 +57,7 @@ const Cart = ({setShowCart}) => {
                             <span className="text total">&#8377;{cartSubTotal}</span>
                         </div>
                         <div className="button">
-                            <div className="checkout-cta">Checkout</div>
+                            <div className="checkout-cta" onClick={handlePayment}>Checkout</div>
                         </div>
                     </div>
                 </>}
